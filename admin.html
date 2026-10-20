@@ -73,17 +73,14 @@ label.chk input{width:20px;height:20px}
 .empty{color:var(--muted);padding:12px 0}
 textarea.msg{min-height:160px;font-size:15px}
 </style>
-<script>
-// ================== ตั้งค่า ==================
-// วางลิงก์ /exec ของ Apps Script ตรงนี้ (ได้จาก การทำให้ใช้งานได้ → จัดการการทำให้ใช้งานได้)
-const API_URL = 'https://script.google.com/macros/s/AKfycbwsGrrXshblRL_uwQnUyRvTsc3hXNTd5rPuYscgkPYOPxgPux6KFQa9YHv0ydSi1qOWUw/exec';
-// ============================================
-</script>
+<!-- ลิงก์ /exec ของ Apps Script อยู่ในไฟล์ config.js (แก้ที่เดียว ใช้ทั้ง 2 หน้า) -->
+<script src="config.js"></script>
 <script>
 // ตัวเชื่อมกับ Apps Script: ใช้ fetch POST แบบ text/plain (ไม่ติด CORS, ไม่ใช้คุกกี้ Google จึงไม่ติดปัญหาหลายบัญชี)
 (function () {
   function call(fn, args) {
-    if (/วางรหัส/.test(API_URL)) return Promise.reject(new Error('ยังไม่ได้ใส่ API_URL ในไฟล์ HTML'));
+    var API_URL = window.API_URL || '';
+    if (!API_URL || /วางรหัส/.test(API_URL)) return Promise.reject(new Error('ยังไม่ได้ใส่ลิงก์ในไฟล์ config.js'));
     return fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ fn: fn, args: args }), credentials: 'omit', redirect: 'follow' })
       .catch(function () { throw new Error('เชื่อมต่อระบบไม่ได้ ลองเช็กอินเทอร์เน็ตแล้วลองใหม่'); })

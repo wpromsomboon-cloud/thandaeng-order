@@ -16,7 +16,7 @@ button{cursor:pointer}
 .top h1{font-size:22px}
 .row{display:flex;gap:8px;align-items:center}
 .who{margin-top:10px}
-select,input[type=text],input[type=url],input[type=number],textarea{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;width:100%}
+select,input[type=text],input[type=url],input[type=number],input[type=password],textarea{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;width:100%}
 .search{margin-top:10px}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
@@ -68,23 +68,21 @@ main{padding:8px 16px 120px}
 .hint{font-size:14px;color:var(--muted);line-height:1.5}
 .x{border:none;background:none;color:var(--muted);font-size:14px;text-decoration:underline}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sheet#login{z-index:40}
 .toast{position:fixed;left:16px;right:16px;bottom:90px;background:var(--dark);color:var(--light);padding:12px 16px;border-radius:12px;z-index:20;display:none}
 .ok{text-align:center;padding:40px 16px}
 .ok .big{font-family:'Kanit',sans-serif;font-size:34px;color:var(--ok);margin:10px 0}
 .empty{color:var(--muted);text-align:center;padding:30px 0}
 .loading{padding:60px 16px;text-align:center;color:var(--muted)}
 </style>
-<script>
-// ================== ตั้งค่า ==================
-// วางลิงก์ /exec ของ Apps Script ตรงนี้ (ได้จาก การทำให้ใช้งานได้ → จัดการการทำให้ใช้งานได้)
-const API_URL = 'https://script.google.com/macros/s/AKfycbwsGrrXshblRL_uwQnUyRvTsc3hXNTd5rPuYscgkPYOPxgPux6KFQa9YHv0ydSi1qOWUw/exec';
-// ============================================
-</script>
+<!-- ลิงก์ /exec ของ Apps Script อยู่ในไฟล์ config.js (แก้ที่เดียว ใช้ทั้ง 2 หน้า) -->
+<script src="config.js"></script>
 <script>
 // ตัวเชื่อมกับ Apps Script: ใช้ fetch POST แบบ text/plain (ไม่ติด CORS, ไม่ใช้คุกกี้ Google จึงไม่ติดปัญหาหลายบัญชี)
 (function () {
   function call(fn, args) {
-    if (/วางรหัส/.test(API_URL)) return Promise.reject(new Error('ยังไม่ได้ใส่ API_URL ในไฟล์ HTML'));
+    var API_URL = window.API_URL || '';
+    if (!API_URL || /วางรหัส/.test(API_URL)) return Promise.reject(new Error('ยังไม่ได้ใส่ลิงก์ในไฟล์ config.js'));
     return fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ fn: fn, args: args }), credentials: 'omit', redirect: 'follow' })
       .catch(function () { throw new Error('เชื่อมต่อระบบไม่ได้ ลองเช็กอินเทอร์เน็ตแล้วลองใหม่'); })
@@ -110,7 +108,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbwsGrrXshblRL_uwQnUyRvT
 <body>
 <div class="top">
   <div class="row" style="justify-content:space-between"><h1>สั่งของ · ถ่านแดง</h1></div>
-  <div class="who"><select id="staff"><option value="">— เลือกชื่อคนสั่ง —</option></select></div>
+  <div class="who row" style="justify-content:space-between"><span id="whoName" class="hint" style="font-size:15px"></span><button class="x" id="logout" type="button">เปลี่ยนคน</button><select id="staff" style="display:none"><option value=""></option></select></div>
   <input id="q" class="search" type="text" placeholder="ค้นหารายการ…" autocomplete="off">
   <div id="bigs" class="bigs" style="display:none"></div>
   <div id="chips" class="chips"></div>
@@ -150,6 +148,14 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbwsGrrXshblRL_uwQnUyRvT
   <button class="btn ghost" id="again" style="margin-top:20px">สั่งใหม่</button>
 </div></div>
 <div id="toast" class="toast"></div>
+<div id="login" class="sheet open"><div style="max-width:420px;margin:0 auto;padding:60px 20px;display:flex;flex-direction:column;gap:14px">
+  <h1 style="font-size:26px">สั่งของ · ถ่านแดง</h1>
+  <p class="hint">เลือกชื่อแล้วใส่ PIN ของคุณ (ถามได้จาก Mat) — ใส่ครั้งเดียว มือถือจะจำไว้</p>
+  <select id="lgName"><option value="">กำลังโหลดรายชื่อ…</option></select>
+  <input id="lgPin" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN">
+  <button class="btn primary" id="lgGo" type="button">เข้าสู่ระบบ</button>
+  <p class="hint" id="lgMsg" style="text-align:center;color:#A8341F"></p>
+</div></div>
 <div id="lightbox" class="lightbox"><img id="lbImg" alt=""><div id="lbName" style="font-weight:600"></div><div style="font-size:14px;opacity:.8">แตะเพื่อปิด</div></div>
 
 <script>
@@ -280,19 +286,48 @@ function doSend(){
     $('doneId').textContent=r.orderId;$('doneText').textContent='ส่ง '+r.count+' รายการเรียบร้อย Mat จะได้รับแจ้งเตือนทางอีเมล';
     $('done').classList.add('open');
   }).withFailureHandler(function(err){
-    btn.disabled=false;btn.textContent='ส่งใบสั่ง';toast('ส่งไม่สำเร็จ: '+(err&&err.message||err));
-  }).submitOrder({staff:who,note:$('note').value,lines:lines,extras:S.extras});
+    btn.disabled=false;btn.textContent='ส่งใบสั่ง';var m=err&&err.message||String(err);if(/PIN|ยังไม่ได้ตั้ง/.test(m)){clearAuth();$('cart').classList.remove('open');showLogin(m)}else toast('ส่งไม่สำเร็จ: '+m);
+  }).submitOrder({staff:who,pin:S.pin,note:$('note').value,lines:lines,extras:S.extras});
 }
 $('again').onclick=function(){$('done').classList.remove('open');S.cat='ทั้งหมด';renderChips();renderList()};
 
 load();
-google.script.run.withSuccessHandler(function(d){
-  S.items=d.items;S.cats=d.cats;S.bigs=d.bigs||[];if(S.big!=='ทั้งหมด'&&S.bigs.indexOf(S.big)<0)S.big='ทั้งหมด';renderBigs();S.units=d.units;S.staff=d.staff;
-  $('staff').innerHTML='<option value="">— เลือกชื่อคนสั่ง —</option>'+d.staff.map(function(n){return'<option'+(n===S.who?' selected':'')+'>'+esc(n)+'</option>'}).join('');
-  $('exUnit').innerHTML=unitOptions('ชิ้น');
-  Object.keys(S.cart).forEach(function(id){if(!byId(id))delete S.cart[id]});
-  renderChips();renderList();
-}).withFailureHandler(function(err){$('list').innerHTML='<div class="empty">โหลดรายการไม่สำเร็จ: '+esc(err&&err.message||err)+'</div>'}).getCatalog();
+var AUTH='td_staff_v1';
+function saveAuth(n,p){try{localStorage.setItem(AUTH,JSON.stringify({n:n,p:p}))}catch(e){}}
+function readAuth(){try{return JSON.parse(localStorage.getItem(AUTH)||'null')}catch(e){return null}}
+function clearAuth(){try{localStorage.removeItem(AUTH)}catch(e){}}
+function showLogin(msg){
+  var cur=$('lgName').value||S.who;
+  $('login').classList.add('open');$('lgMsg').textContent=msg||'';$('lgPin').value='';$('lgGo').disabled=false;
+  google.script.run.withSuccessHandler(function(names){
+    cur=$('lgName').value||cur;
+    $('lgName').innerHTML='<option value="">— เลือกชื่อของคุณ —</option>'+names.map(function(n){return'<option'+(n===cur?' selected':'')+'>'+esc(n)+'</option>'}).join('');
+  }).withFailureHandler(function(e){$('lgMsg').textContent='โหลดรายชื่อไม่สำเร็จ: '+(e&&e.message||e)}).getStaffNames();
+}
+function loadCatalog(name,pin,fromSaved){
+  google.script.run.withSuccessHandler(function(d){
+    S.who=name;S.pin=pin;saveAuth(name,pin);save();
+    $('staff').innerHTML='<option selected>'+esc(name)+'</option>';$('whoName').textContent='👤 '+name;
+    $('login').classList.remove('open');
+    S.items=d.items;S.cats=d.cats;S.bigs=d.bigs||[];if(S.big!=='ทั้งหมด'&&S.bigs.indexOf(S.big)<0)S.big='ทั้งหมด';renderBigs();S.units=d.units;S.staff=d.staff;
+    $('exUnit').innerHTML=unitOptions('ชิ้น');
+    Object.keys(S.cart).forEach(function(id){if(!byId(id))delete S.cart[id]});
+    renderChips();renderList();
+  }).withFailureHandler(function(err){
+    var m=err&&err.message||String(err);
+    if(/PIN|ชื่อ|รายชื่อ/.test(m)){clearAuth();showLogin(fromSaved?'กรุณาเข้าสู่ระบบใหม่ ('+m+')':m)}
+    else{$('lgGo').disabled=false;$('lgMsg').textContent=m;$('list').innerHTML='<div class="empty">โหลดรายการไม่สำเร็จ: '+esc(m)+'</div>'}
+  }).getCatalog(name,pin);
+}
+$('lgGo').onclick=function(){
+  var n=$('lgName').value,p=$('lgPin').value.trim();
+  if(!n){$('lgMsg').textContent='เลือกชื่อก่อน';return}
+  if(!p){$('lgMsg').textContent='ใส่ PIN ก่อน';return}
+  $('lgGo').disabled=true;$('lgMsg').textContent='กำลังตรวจสอบ…';loadCatalog(n,p,false);
+};
+$('lgPin').addEventListener('keydown',function(e){if(e.key==='Enter')$('lgGo').click()});
+$('logout').onclick=function(){clearAuth();S.who='';S.pin='';save();showLogin('')};
+(function(){var a=readAuth();if(a&&a.n&&a.p){$('lgMsg').textContent='กำลังเข้าสู่ระบบ…';loadCatalog(a.n,a.p,true)}else showLogin('')})();
 </script>
 </body>
 </html>
