@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>สั่งของ · ถ่านแดง</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600&family=Kanit:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--dark:#221C18;--light:#FAF6EF;--sand:#F2EADF;--line:#E3D9CC;--muted:#6E625A;--ember:#C2412A;--ember-bg:#F7E1D9;--blue:#2F5D8A;--blue-bg:#E3ECF5;--ok:#2E5E3A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--light);color:var(--dark);font-family:'IBM Plex Sans Thai',Tahoma,sans-serif;font-size:16px;-webkit-tap-highlight-color:transparent}
+h1,h2,h3{font-family:'Kanit',Tahoma,sans-serif;font-weight:600;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.top{position:sticky;top:0;z-index:5;background:var(--light);padding:14px 16px 10px;border-bottom:1px solid var(--line)}
+.top h1{font-size:22px}
+.row{display:flex;gap:8px;align-items:center}
+.who{margin-top:10px}
+select,input[type=text],input[type=url],input[type=number],textarea{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;width:100%}
+.search{margin-top:10px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.bigs{display:flex;gap:6px;margin-top:10px;background:var(--sand);padding:4px;border-radius:14px}
+.big{flex:1;border:none;background:none;padding:9px 10px;border-radius:11px;font-weight:600;color:var(--muted)}
+.big.on{background:#fff;color:var(--dark);box-shadow:0 1px 4px rgba(34,28,24,.12)}
+.big.mk.on{color:var(--blue)}
+.warnbox{display:none;background:#FBF0D3;color:#6B5216;border-radius:14px;padding:14px;margin-bottom:12px;line-height:1.5}
+.warnbox.open{display:block}
+.warnbox .row{margin-top:10px}
+.chip{flex:none;border:none;background:var(--sand);padding:6px 14px;border-radius:999px;white-space:nowrap}
+.chip.on{background:var(--dark);color:var(--light)}
+main{padding:8px 16px 120px}
+.cat{font-size:15px;color:var(--muted);margin:18px 0 6px;font-weight:600}
+.item{display:flex;flex-direction:column;gap:8px;padding:12px 0;border-bottom:1px solid var(--line)}
+.item .name{font-weight:600;line-height:1.35}
+.item .meta{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.item.has-img .qty{margin-left:auto}
+.badge{font-size:13px;padding:2px 10px;border-radius:8px;background:var(--blue-bg);color:var(--blue);white-space:nowrap}
+.badge.mat{background:var(--sand);color:var(--muted)}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:20px;line-height:1}
+.qty input{width:62px;text-align:center;padding:8px 4px}
+.qty select{width:auto;padding:8px 6px}
+.item.has-img{flex-direction:row;align-items:flex-start;gap:12px}
+.item .body{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.thumb{flex:none;width:56px;height:56px;border-radius:12px;object-fit:cover;background:var(--sand);border:1px solid var(--line);cursor:zoom-in}
+.lightbox{position:fixed;inset:0;background:rgba(34,28,24,.85);z-index:30;display:none;align-items:center;justify-content:center;padding:24px;flex-direction:column;gap:12px;color:var(--light);text-align:center}
+.lightbox.open{display:flex}
+.lightbox img{max-width:100%;max-height:75vh;border-radius:16px;background:#fff}
+.item.picked{background:linear-gradient(90deg,#FBEDE6,transparent);margin:0 -16px;padding:12px 16px}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--light) 30%)}
+.btn{display:block;width:100%;border:none;border-radius:14px;padding:14px;font-weight:600;font-size:17px;text-align:center;text-decoration:none}
+.btn.primary{background:var(--ember);color:var(--light)}
+.btn.primary:disabled{opacity:.45}
+.btn.blue{background:var(--blue);color:var(--light);padding:10px;font-size:15px}
+.btn.ghost{background:var(--sand);color:var(--dark)}
+.sheet{position:fixed;inset:0;background:var(--light);z-index:10;overflow:auto;display:none}
+.sheet.open{display:block}
+.sheet header{position:sticky;top:0;background:var(--light);padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.sheet section{padding:8px 16px}
+.group-title{font-weight:600;margin:16px 0 8px}
+.group-title.mk{color:var(--blue)}.group-title.mt{color:#A8341F}
+.card{border-radius:14px;padding:12px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
+.card.mk{background:var(--blue-bg)}.card.mt{background:var(--ember-bg)}.card.ex{background:var(--sand)}
+.card .r{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.done{display:flex;gap:8px;align-items:center;font-size:15px;color:var(--blue)}
+.done input{width:22px;height:22px}
+.hint{font-size:14px;color:var(--muted);line-height:1.5}
+.x{border:none;background:none;color:var(--muted);font-size:14px;text-decoration:underline}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.toast{position:fixed;left:16px;right:16px;bottom:90px;background:var(--dark);color:var(--light);padding:12px 16px;border-radius:12px;z-index:20;display:none}
+.ok{text-align:center;padding:40px 16px}
+.ok .big{font-family:'Kanit',sans-serif;font-size:34px;color:var(--ok);margin:10px 0}
+.empty{color:var(--muted);text-align:center;padding:30px 0}
+.loading{padding:60px 16px;text-align:center;color:var(--muted)}
+</style>
+<script>
+// ================== ตั้งค่า ==================
+// วางลิงก์ /exec ของ Apps Script ตรงนี้ (ได้จาก การทำให้ใช้งานได้ → จัดการการทำให้ใช้งานได้)
+const API_URL = 'https://script.google.com/macros/s/วางรหัสตรงนี้/exec';
+// ============================================
+</script>
+<script>
+// ตัวเชื่อมกับ Apps Script: ใช้ fetch POST แบบ text/plain (ไม่ติด CORS, ไม่ใช้คุกกี้ Google จึงไม่ติดปัญหาหลายบัญชี)
+(function () {
+  function call(fn, args) {
+    if (/วางรหัส/.test(API_URL)) return Promise.reject(new Error('ยังไม่ได้ใส่ API_URL ในไฟล์ HTML'));
+    return fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ fn: fn, args: args }), credentials: 'omit', redirect: 'follow' })
+      .catch(function () { throw new Error('เชื่อมต่อระบบไม่ได้ ลองเช็กอินเทอร์เน็ตแล้วลองใหม่'); })
+      .then(function (r) { if (!r.ok) throw new Error('ระบบตอบกลับผิดพลาด (' + r.status + ')'); return r.json(); })
+      .then(function (j) { if (!j || !j.ok) throw new Error((j && j.error) || 'เกิดข้อผิดพลาด'); return j.data; });
+  }
+  function runner() {
+    var ok = null, no = null;
+    var p = new Proxy({}, { get: function (t, k) {
+      if (k === 'withSuccessHandler') return function (f) { ok = f; return p; };
+      if (k === 'withFailureHandler') return function (f) { no = f; return p; };
+      return function () {
+        var a = [].slice.call(arguments);
+        call(k, a).then(function (d) { if (ok) ok(d); }, function (e) { if (no) no(e); else console.error(e); });
+      };
+    } });
+    return p;
+  }
+  window.google = { script: { get run() { return runner(); } } };
+})();
+</script>
+</head>
+<body>
+<div class="top">
+  <div class="row" style="justify-content:space-between"><h1>สั่งของ · ถ่านแดง</h1></div>
+  <div class="who"><select id="staff"><option value="">— เลือกชื่อคนสั่ง —</option></select></div>
+  <input id="q" class="search" type="text" placeholder="ค้นหารายการ…" autocomplete="off">
+  <div id="bigs" class="bigs" style="display:none"></div>
+  <div id="chips" class="chips"></div>
+</div>
+<main id="list"><div class="loading">กำลังโหลดรายการ…</div></main>
+<div class="bar"><div class="row"><button id="openExtra" class="btn ghost" style="flex:0 0 auto;width:auto;padding:14px 16px">+ ของนอกลิสต์</button><button id="openCart" class="btn primary" style="flex:1">ดูรายการที่เลือก (0)</button></div></div>
+
+<div id="cart" class="sheet">
+  <header><h2 style="font-size:20px">รายการที่เลือก</h2><button class="x" id="closeCart">← กลับไปเลือกต่อ</button></header>
+  <section id="cartBody"></section>
+  <section>
+    <div class="group-title">ของนอกลิสต์</div>
+    <div class="hint">ของที่ไม่มีในรายการ พิมพ์ชื่อได้เลย ถ้ามีลิงก์สินค้าแปะได้ ระบบจะเช็กความปลอดภัยก่อนส่งให้ Mat</div>
+    <div id="extras"></div>
+    <div class="card ex" style="margin-top:10px">
+      <input id="exName" type="text" placeholder="ชื่อของ เช่น ถุงหูหิ้ว 6x14">
+      <div class="grid2"><input id="exQty" type="number" inputmode="decimal" min="0" step="any" placeholder="จำนวน"><select id="exUnit"></select></div>
+      <input id="exLink" type="url" placeholder="ลิงก์สินค้า (ไม่บังคับ)">
+      <button class="btn ghost" id="exAdd" type="button">+ เพิ่มของนอกลิสต์</button>
+    </div>
+  </section>
+  <section>
+    <div class="group-title">หมายเหตุถึง Mat</div>
+    <textarea id="note" rows="2" placeholder="เช่น ของหมดตั้งแต่เมื่อวาน"></textarea>
+  </section>
+  <section style="padding-bottom:40px">
+    <div id="mkWarn" class="warnbox"><b id="mkWarnText"></b><div class="hint" style="color:#6B5216">ถ้าส่งไปเลย รายการนี้จะไปอยู่ใน "รอสั่ง" ให้ Mat หรือ staff สั่งต่อ</div><div class="row"><button class="btn ghost" id="mkBack" type="button" style="flex:1;padding:10px">กลับไปติ๊ก</button><button class="btn primary" id="mkGo" type="button" style="flex:1;padding:10px">ส่งต่อเลย</button></div></div>
+    <button class="btn primary" id="send">ส่งใบสั่ง</button>
+    <p class="hint" id="sendHint" style="text-align:center"></p>
+  </section>
+</div>
+
+<div id="done" class="sheet"><div class="ok">
+  <div style="font-size:44px">✓</div>
+  <div class="big" id="doneId"></div>
+  <p id="doneText">ส่งใบสั่งเรียบร้อย Mat จะได้รับแจ้งเตือนทางอีเมล</p>
+  <button class="btn ghost" id="again" style="margin-top:20px">สั่งใหม่</button>
+</div></div>
+<div id="toast" class="toast"></div>
+<div id="lightbox" class="lightbox"><img id="lbImg" alt=""><div id="lbName" style="font-weight:600"></div><div style="font-size:14px;opacity:.8">แตะเพื่อปิด</div></div>
+
+<script>
+var KEY='td_cart_v1';
+var S={items:[],cats:[],bigs:[],big:'ทั้งหมด',units:[],staff:[],cat:'ทั้งหมด',q:'',cart:{},makroDone:{},extras:[],who:''};
+var $=function(id){return document.getElementById(id)};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({cart:S.cart,makroDone:S.makroDone,extras:S.extras,who:S.who,note:$('note').value}))}catch(e){}}
+function load(){try{var d=JSON.parse(localStorage.getItem(KEY)||'{}');S.cart=d.cart||{};S.makroDone=d.makroDone||{};S.extras=d.extras||[];S.who=d.who||'';$('note').value=d.note||''}catch(e){}}
+function toast(t){var el=$('toast');el.textContent=t;el.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(function(){el.style.display='none'},2600)}
+function unitOptions(sel){var u=S.units.slice();if(sel&&u.indexOf(sel)<0)u.unshift(sel);return u.map(function(x){return'<option'+(x===sel?' selected':'')+'>'+esc(x)+'</option>'}).join('')}
+function byId(id){for(var i=0;i<S.items.length;i++)if(S.items[i].id===id)return S.items[i];return null}
+function n2(v){var n=Math.round(Number(v)*100)/100;return isFinite(n)&&n>0?n:0}
+
+function inBig(i){return S.big==='ทั้งหมด'||i.big===S.big}
+function renderBigs(){
+  if(!S.bigs.length){$('bigs').style.display='none';return}
+  $('bigs').style.display='flex';
+  $('bigs').innerHTML=['ทั้งหมด'].concat(S.bigs).map(function(b){return'<button class="big'+(b===S.big?' on':'')+(b==='แม็กโคร'?' mk':'')+'" data-big="'+esc(b)+'">'+esc(b)+'</button>'}).join('');
+}
+function renderChips(){
+  var cats=['ทั้งหมด','ที่เลือกไว้'].concat(S.cats.filter(function(c){return S.items.some(function(i){return i.cat===c&&inBig(i)})}));
+  if(cats.indexOf(S.cat)<0)S.cat='ทั้งหมด';
+  $('chips').innerHTML=cats.map(function(c){return'<button class="chip'+(c===S.cat?' on':'')+'" data-c="'+esc(c)+'">'+esc(c)+'</button>'}).join('');
+}
+function renderList(){
+  var q=S.q.trim().toLowerCase(),html='',last='';
+  var list=S.items.filter(function(i){
+    if(!inBig(i))return false;
+    if(S.cat==='ที่เลือกไว้'&&!S.cart[i.id])return false;
+    if(S.cat!=='ทั้งหมด'&&S.cat!=='ที่เลือกไว้'&&i.cat!==S.cat)return false;
+    return !q||i.name.toLowerCase().indexOf(q)>=0;
+  });
+  list.forEach(function(i){
+    if(i.cat!==last){html+='<div class="cat">'+esc(i.cat)+'</div>';last=i.cat}
+    var c=S.cart[i.id]||{q:0,u:i.unit};
+    html+='<div class="item'+(c.q?' picked':'')+(i.img?' has-img':'')+'" data-id="'+esc(i.id)+'">'+(i.img?'<img class="thumb" loading="lazy" alt="" src="'+esc(i.img)+'" data-zoom="'+esc(i.id)+'" onerror="this.style.visibility=\'hidden\'">':'')+'<div class="body"><div class="name">'+esc(i.name)+'</div><div class="meta">'+
+      (i.makro?'<span class="badge">แม็กโคร</span>':'<span class="badge mat">ส่งให้ Mat</span>')+
+      '<div class="qty"><button type="button" data-a="-">−</button><input type="number" inputmode="decimal" min="0" step="any" value="'+(c.q||'')+'" placeholder="0" data-a="q"><button type="button" data-a="+">+</button><select data-a="u">'+unitOptions(c.u||i.unit)+'</select></div></div></div></div>';
+  });
+  $('list').innerHTML=html||'<div class="empty">ไม่พบรายการ'+(q?' "'+esc(S.q)+'"':'')+'</div>';
+  updateBar();
+}
+function count(){return Object.keys(S.cart).filter(function(k){return S.cart[k].q>0&&byId(k)}).length+S.extras.length}
+function updateBar(){var n=count();$('openCart').textContent='ดูรายการที่เลือก ('+n+')'}
+function setQty(id,q,u){
+  var i=byId(id);if(!i)return;q=n2(q);
+  if(!q){delete S.cart[id];delete S.makroDone[id]}else S.cart[id]={q:q,u:u||(S.cart[id]&&S.cart[id].u)||i.unit};
+  save();
+}
+function renderCart(){
+  $('mkWarn').classList.remove('open');
+  var mk=[],mt=[];
+  Object.keys(S.cart).forEach(function(id){var i=byId(id),c=S.cart[id];if(!i||!c.q)return;(i.makro?mk:mt).push({i:i,c:c})});
+  var h='';
+  if(mk.length){
+    h+='<div class="group-title mk">สั่งที่แม็กโคร ('+mk.length+')</div><p class="hint">กดเปิดในแม็กโคร ใส่ตะกร้าตามจำนวน แล้วติ๊ก "สั่งแล้ว"</p>';
+    mk.forEach(function(x){h+='<div class="card mk"><div class="r"><b>'+esc(x.i.name)+'</b><span>× '+x.c.q+' '+esc(x.c.u)+'</span></div>'+
+      '<a class="btn blue" href="'+esc(x.i.makro)+'" target="_blank" rel="noopener noreferrer">เปิดในแม็กโคร ↗ ใส่ '+x.c.q+' '+esc(x.c.u)+'</a>'+
+      '<label class="done"><input type="checkbox" data-done="'+esc(x.i.id)+'"'+(S.makroDone[x.i.id]?' checked':'')+'> สั่งแล้ว ✓</label></div>'});
+  }
+  if(mt.length){
+    h+='<div class="group-title mt">ส่งให้ Mat สั่ง ('+mt.length+')</div>';
+    mt.forEach(function(x){h+='<div class="card mt"><div class="r"><b>'+esc(x.i.name)+'</b><span style="white-space:nowrap">'+x.c.q+' '+esc(x.c.u)+'</span></div><div class="r"><span class="hint">'+esc(x.i.supplier)+'</span><button class="x" data-rm="'+esc(x.i.id)+'">เอาออก</button></div></div>'});
+  }
+  if(!mk.length&&!mt.length)h='<p class="hint" style="padding:12px 0">ยังไม่ได้เลือกของจากรายการ สั่งเฉพาะของนอกลิสต์ด้านล่างก็ได้</p>';
+  $('cartBody').innerHTML=h;
+  $('extras').innerHTML=S.extras.map(function(x,k){return'<div class="card ex"><div class="r"><b>'+esc(x.name)+'</b><span style="white-space:nowrap">'+x.qty+' '+esc(x.unit)+'</span></div>'+(x.link?'<div class="hint" style="word-break:break-all">ลิงก์: '+esc(x.link)+'</div>':'')+'<div class="r"><span></span><button class="x" data-rx="'+k+'">เอาออก</button></div></div>'}).join('');
+  var who=$('staff').value;
+  $('send').disabled=!count()||!who;
+  $('sendHint').textContent=!who?'เลือกชื่อคนสั่งด้านบนก่อนส่ง':'';
+}
+
+document.addEventListener('click',function(e){
+  var t=e.target;
+  if(t.dataset.zoom){var z=byId(t.dataset.zoom);$('lbImg').src=z.img.replace(/sz=w\d+/,'sz=w1000');$('lbName').textContent=z.name;$('lightbox').classList.add('open');return}
+  if(t.closest&&t.closest('#lightbox')){$('lightbox').classList.remove('open');return}
+  if(t.dataset.big){S.big=t.dataset.big;renderBigs();renderChips();renderList();window.scrollTo(0,0);return}
+  if(t.dataset.c){S.cat=t.dataset.c;renderChips();renderList();window.scrollTo(0,0);return}
+  var row=t.closest&&t.closest('.item');
+  if(row&&(t.dataset.a==='+'||t.dataset.a==='-')){
+    var id=row.dataset.id,c=S.cart[id]||{q:0,u:byId(id).unit};
+    var q=Math.max(0,Math.round((Number(c.q)+(t.dataset.a==='+'?1:-1))*100)/100);
+    setQty(id,q,row.querySelector('select').value);
+    row.querySelector('input').value=q||'';row.classList.toggle('picked',!!q);updateBar();return;
+  }
+  if(t.dataset.rm){setQty(t.dataset.rm,0);renderCart();renderList();return}
+  if(t.dataset.rx!=null&&t.dataset.rx!==''){S.extras.splice(Number(t.dataset.rx),1);save();renderCart();updateBar();return}
+});
+document.addEventListener('change',function(e){
+  var t=e.target,row=t.closest&&t.closest('.item');
+  if(row&&(t.dataset.a==='q'||t.dataset.a==='u')){
+    var id=row.dataset.id,q=row.querySelector('input').value,u=row.querySelector('select').value;
+    setQty(id,q,u);row.classList.toggle('picked',!!S.cart[id]);if(!S.cart[id])row.querySelector('input').value='';updateBar();
+  }
+  if(t.dataset.done){if(t.checked)S.makroDone[t.dataset.done]=true;else delete S.makroDone[t.dataset.done];save()}
+  if(t.id==='staff'){S.who=t.value;save();renderCart()}
+  if(t.id==='note')save();
+});
+$('q').addEventListener('input',function(){S.q=this.value;renderList()});
+$('openCart').onclick=function(){renderCart();$('cart').classList.add('open');window.scrollTo(0,0)};
+$('openExtra').onclick=function(){renderCart();$('cart').classList.add('open');setTimeout(function(){$('exName').scrollIntoView({block:'center'});$('exName').focus()},50)};
+$('closeCart').onclick=function(){$('cart').classList.remove('open');renderList()};
+$('exAdd').onclick=function(){
+  var name=$('exName').value.trim(),qty=n2($('exQty').value),link=$('exLink').value.trim();
+  if(!name){toast('ใส่ชื่อของก่อน');return}
+  if(!qty){toast('ใส่จำนวนก่อน');return}
+  if(link&&!/^https?:\/\/\S+$/i.test(link)&&!/^[\w.-]+\.[a-z]{2,}\S*$/i.test(link)){toast('ลิงก์ไม่ถูกต้อง');return}
+  S.extras.push({name:name,qty:qty,unit:$('exUnit').value,link:link});
+  $('exName').value='';$('exQty').value='';$('exLink').value='';save();renderCart();updateBar();
+};
+function unticked(){return Object.keys(S.cart).filter(function(id){var i=byId(id);return i&&i.makro&&S.cart[id].q>0&&!S.makroDone[id]})}
+$('mkBack').onclick=function(){$('mkWarn').classList.remove('open');var el=document.querySelector('input[data-done]:not(:checked)');if(el)el.scrollIntoView({block:'center'})};
+$('mkGo').onclick=function(){$('mkWarn').classList.remove('open');doSend()};
+$('send').onclick=function(){
+  var who=$('staff').value;if(!who){toast('เลือกชื่อคนสั่งก่อน');return}
+  var u=unticked();
+  if(u.length){$('mkWarnText').textContent='ยังมีของแม็กโคร '+u.length+' รายการที่ยังไม่ได้ติ๊ก "สั่งแล้ว" ส่งต่อเลยไหม?';$('mkWarn').classList.add('open');$('mkWarn').scrollIntoView({block:'center'});return}
+  doSend();
+};
+function doSend(){
+  var who=$('staff').value;
+  var lines=Object.keys(S.cart).filter(function(id){return byId(id)&&S.cart[id].q>0}).map(function(id){return{itemId:id,qty:S.cart[id].q,unit:S.cart[id].u,makroDone:!!S.makroDone[id]}});
+  var btn=$('send');btn.disabled=true;btn.textContent=S.extras.some(function(x){return x.link})?'กำลังเช็กลิงก์และส่ง…':'กำลังส่ง…';
+  google.script.run.withSuccessHandler(function(r){
+    S.cart={};S.makroDone={};S.extras=[];$('note').value='';save();
+    btn.textContent='ส่งใบสั่ง';$('cart').classList.remove('open');
+    $('doneId').textContent=r.orderId;$('doneText').textContent='ส่ง '+r.count+' รายการเรียบร้อย Mat จะได้รับแจ้งเตือนทางอีเมล';
+    $('done').classList.add('open');
+  }).withFailureHandler(function(err){
+    btn.disabled=false;btn.textContent='ส่งใบสั่ง';toast('ส่งไม่สำเร็จ: '+(err&&err.message||err));
+  }).submitOrder({staff:who,note:$('note').value,lines:lines,extras:S.extras});
+}
+$('again').onclick=function(){$('done').classList.remove('open');S.cat='ทั้งหมด';renderChips();renderList()};
+
+load();
+google.script.run.withSuccessHandler(function(d){
+  S.items=d.items;S.cats=d.cats;S.bigs=d.bigs||[];if(S.big!=='ทั้งหมด'&&S.bigs.indexOf(S.big)<0)S.big='ทั้งหมด';renderBigs();S.units=d.units;S.staff=d.staff;
+  $('staff').innerHTML='<option value="">— เลือกชื่อคนสั่ง —</option>'+d.staff.map(function(n){return'<option'+(n===S.who?' selected':'')+'>'+esc(n)+'</option>'}).join('');
+  $('exUnit').innerHTML=unitOptions('ชิ้น');
+  Object.keys(S.cart).forEach(function(id){if(!byId(id))delete S.cart[id]});
+  renderChips();renderList();
+}).withFailureHandler(function(err){$('list').innerHTML='<div class="empty">โหลดรายการไม่สำเร็จ: '+esc(err&&err.message||err)+'</div>'}).getCatalog();
+</script>
+</body>
+</html>
